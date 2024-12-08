@@ -16,8 +16,9 @@ public class UserControllerTest {
     void before() {
         userController = new UserController();
     }
+
     @Test
-    void Add1Film() {
+    void addAUser() {
         User user = new User(1L, "Email 1", "Login 1", "Name 1", LocalDate.now());
 
         userController.createUser(user);

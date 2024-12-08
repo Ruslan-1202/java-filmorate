@@ -16,8 +16,9 @@ public class FilmControllerTest {
     void before() {
         filmController = new FilmController();
     }
+
     @Test
-    void Add1Film() {
+    void addAFilm() {
         Film film = new Film(1L, "Name 1", "Descr 1", LocalDate.now(), 20);
 
         filmController.createFilm(film);
