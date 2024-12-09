@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmManager;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -14,8 +15,8 @@ import java.util.HashMap;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final HashMap<Long, Film> films = new HashMap<>();
-    private Long counter = 0L;
+
+    FilmManager filmManager = new FilmManager();
 
     private static final int MIN_YEAR = 1895;
     private static final int MIN_MONTH = 12;
@@ -23,7 +24,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return films.values();
+        return filmManager.getValues();
     }
 
     @PostMapping
@@ -31,9 +32,7 @@ public class FilmController {
         log.debug("Создание фильма");
 
         check(film);
-        film.setId(++counter);
-        films.put(counter, film);
-        return film;
+        return filmManager.create(film);
     }
 
     @PutMapping
@@ -42,7 +41,7 @@ public class FilmController {
 
         Film newFilm = film;
         Long oldId = newFilm.getId();
-        Film oldFilm = films.get(oldId);
+        Film oldFilm = filmManager.get(oldId);
 
         if (oldFilm == null) {
             log.error("Фильм c ID = {} не найден", oldId);
@@ -56,8 +55,7 @@ public class FilmController {
         oldFilm.setDuration(newFilm.getDuration());
         oldFilm.setReleaseDate(newFilm.getReleaseDate());
 
-        films.put(oldId, oldFilm);
-        return oldFilm;
+        return filmManager.update(oldFilm);
     }
 
     private void check(Film film) throws ValidationException {

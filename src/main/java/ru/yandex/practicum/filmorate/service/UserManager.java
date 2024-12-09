@@ -25,6 +25,6 @@ public class UserManager {
     }
 
     public User update(User user) {
-        users.put(user.getId(), user);
+        return users.put(user.getId(), user);
     }
 }
