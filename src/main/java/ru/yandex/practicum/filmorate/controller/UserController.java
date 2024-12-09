@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.EmptyNameException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserManager;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -15,13 +16,13 @@ import java.util.HashMap;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final HashMap<Long, User> users = new HashMap<>();
-    private Long counter = 0L;
+
+    UserManager userManager = new UserManager();
 
     @GetMapping
     public Collection<User> getUsers() {
         log.debug("Получение всех записей");
-        return users.values();
+        return userManager.getValues();
     }
 
     @PostMapping
@@ -33,9 +34,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        user.setId(++counter);
-        users.put(counter, user);
-        return user;
+        return userManager.create(user);
     }
 
     @PutMapping
@@ -43,7 +42,7 @@ public class UserController {
         log.debug("Обновление пользователя");
         User newUser = user;
         Long oldId = newUser.getId();
-        User oldUser = users.get(oldId);
+        User oldUser = userManager.get(oldId);
 
         if (oldUser == null) {
             log.error("Пользователь c ID = {} не найден", oldId);
@@ -61,8 +60,7 @@ public class UserController {
         oldUser.setEmail(newUser.getEmail());
         oldUser.setBirthday(newUser.getBirthday());
 
-        users.put(oldId, oldUser);
-        return oldUser;
+        return userManager.update(oldUser);
     }
 
     private void check(User user) throws ValidationException, EmptyNameException {
