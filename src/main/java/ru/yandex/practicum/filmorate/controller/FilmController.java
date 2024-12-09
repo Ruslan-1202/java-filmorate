@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.service.FilmManager;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
 
 @RestController()
 @RequestMapping("/films")

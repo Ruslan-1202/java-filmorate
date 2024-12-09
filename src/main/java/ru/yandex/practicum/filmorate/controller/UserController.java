@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.service.UserManager;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
 
 @RestController()
 @RequestMapping("/users")
