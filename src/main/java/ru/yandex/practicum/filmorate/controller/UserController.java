@@ -15,7 +15,6 @@ import java.util.Collection;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-
     UserManager userManager = new UserManager();
 
     @GetMapping
