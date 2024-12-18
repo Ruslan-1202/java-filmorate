@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmManager;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -13,9 +14,10 @@ import java.util.Collection;
 @RestController()
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
 
-    FilmManager filmManager = new FilmManager();
+    final FilmService filmService;
 
     private static final int MIN_YEAR = 1895;
     private static final int MIN_MONTH = 12;
@@ -23,7 +25,7 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return filmManager.getValues();
+        return filmService.getValues();
     }
 
     @PostMapping
@@ -31,7 +33,7 @@ public class FilmController {
         log.debug("Создание фильма");
 
         check(film);
-        return filmManager.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
@@ -40,7 +42,7 @@ public class FilmController {
 
         Film newFilm = film;
         Long oldId = newFilm.getId();
-        Film oldFilm = filmManager.get(oldId);
+        Film oldFilm = filmService.get(oldId);
 
         if (oldFilm == null) {
             log.error("Фильм c ID = {} не найден", oldId);
@@ -54,7 +56,7 @@ public class FilmController {
         oldFilm.setDuration(newFilm.getDuration());
         oldFilm.setReleaseDate(newFilm.getReleaseDate());
 
-        return filmManager.update(oldFilm);
+        return filmService.update(oldFilm);
     }
 
     private void check(Film film) throws ValidationException {

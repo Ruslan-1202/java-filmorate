@@ -1,12 +1,13 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.EmptyNameException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserManager;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -14,13 +15,15 @@ import java.util.Collection;
 @RestController()
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
-    UserManager userManager = new UserManager();
+
+    final UserService userService;
 
     @GetMapping
     public Collection<User> getUsers() {
         log.debug("Получение всех записей");
-        return userManager.getValues();
+        return userService.getValues();
     }
 
     @PostMapping
@@ -32,7 +35,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        return userManager.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
@@ -40,7 +43,7 @@ public class UserController {
         log.debug("Обновление пользователя");
         User newUser = user;
         Long oldId = newUser.getId();
-        User oldUser = userManager.get(oldId);
+        User oldUser = userService.get(oldId);
 
         if (oldUser == null) {
             log.error("Пользователь c ID = {} не найден", oldId);
@@ -58,7 +61,7 @@ public class UserController {
         oldUser.setEmail(newUser.getEmail());
         oldUser.setBirthday(newUser.getBirthday());
 
-        return userManager.update(oldUser);
+        return userService.update(oldUser);
     }
 
     private void check(User user) throws ValidationException, EmptyNameException {

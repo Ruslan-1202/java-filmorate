@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
 
-public class UserManager {
+@Service
+public class UserService {
     private final HashMap<Long, User> users = new HashMap<>();
     private Long counter = 0L;
 
