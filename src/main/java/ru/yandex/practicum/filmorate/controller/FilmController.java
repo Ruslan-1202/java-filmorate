@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -28,6 +29,7 @@ public class FilmController {
         return filmService.getValues();
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.debug("Создание фильма");
@@ -63,7 +65,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> topLikes(@RequestParam("count") Long count) {
+    public Collection<Film> topLikes(@RequestParam(value = "count", defaultValue = "10") Long count) {
         log.debug("Запрос по количеству лайков");
         return filmService.topLikes(count);
     }
@@ -75,7 +77,7 @@ public class FilmController {
         }
 
         if (film.getReleaseDate().isBefore(LocalDate.of(MIN_YEAR, MIN_MONTH, MIN_DAY))) {
-            log.error("Дата не может быть раньше 28.12.1895");
+            log.error("Дата не может быть раньше {}.{}.{}", MIN_DAY, MIN_MONTH, MIN_YEAR);
             throw new ValidationException("Дата не может быть раньше 28.12.1895");
         }
     }

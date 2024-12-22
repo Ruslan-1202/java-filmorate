@@ -43,7 +43,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Set<User> getLikeUsers(Film film) {
-        return likes.get(film);
+        return likes.getOrDefault(film, new HashSet<>());
     }
 
     @Override

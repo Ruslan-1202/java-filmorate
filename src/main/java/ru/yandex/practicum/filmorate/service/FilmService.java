@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,13 +64,10 @@ public class FilmService {
     }
 
     public Collection<Film> topLikes(Long count) {
-        Map<Film, Long> topLikes =
-                filmStorage.getValues().stream()
-                        //.map(b->filmStorage.getCountLikes(b)))
-                        .collect(Collectors.toMap(a -> a, a -> filmStorage.getCountLikes(a)));
-
-        //  topLikes.
-        return topLikes.keySet();
+        return filmStorage.getValues().stream()
+                .sorted((Film a, Film b) -> (int) filmStorage.getCountLikes(b) - (int) filmStorage.getCountLikes(a))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     private User getUser(Long id) {
