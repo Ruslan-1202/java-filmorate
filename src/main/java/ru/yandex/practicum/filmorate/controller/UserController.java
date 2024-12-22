@@ -64,6 +64,12 @@ public class UserController {
         return userService.update(oldUser);
     }
 
+    @GetMapping("{id}")
+    public User getUser(@PathVariable("id") Long id) {
+        log.debug("Получение одного фильма");
+        return userService.get(id);
+    }
+
     private void check(User user) throws ValidationException, EmptyNameException {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Дата рождения не может быть в будущем");

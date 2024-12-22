@@ -31,7 +31,6 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         log.debug("Создание фильма");
-
         check(film);
         return filmService.create(film);
     }
@@ -39,24 +38,34 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
         log.debug("Обновление фильма");
+        check(film);
+        return filmService.update(film);
+    }
 
-        Film newFilm = film;
-        Long oldId = newFilm.getId();
-        Film oldFilm = filmService.get(oldId);
+    @GetMapping("{id}")
+    public Film getFilm(@PathVariable("id") Long id) {
+        log.debug("Получение одного фильма");
+        return filmService.get(id);
+    }
 
-        if (oldFilm == null) {
-            log.error("Фильм c ID = {} не найден", oldId);
-            throw new ValidationException("Фильм не найден");
-        }
+    @PutMapping("{id}/like/{userId}")
+    public void setLike(@PathVariable("id") Long id,
+                        @PathVariable("userId") Long userId) {
+        log.debug("Ставим лайк фильму");
+        filmService.setLike(id, userId);
+    }
 
-        check(newFilm);
+    @DeleteMapping("{id}/like/{userId}")
+    public void deleteLike(@PathVariable("id") Long id,
+                           @PathVariable("userId") Long userId) {
+        log.debug("Удаляем лайк фильму");
+        filmService.deleteLike(id, userId);
+    }
 
-        oldFilm.setDescription(newFilm.getDescription());
-        oldFilm.setName(newFilm.getName());
-        oldFilm.setDuration(newFilm.getDuration());
-        oldFilm.setReleaseDate(newFilm.getReleaseDate());
-
-        return filmService.update(oldFilm);
+    @GetMapping("/popular")
+    public Collection<Film> topLikes(@RequestParam("count") Long count) {
+        log.debug("Запрос по количеству лайков");
+        return filmService.topLikes(count);
     }
 
     private void check(Film film) throws ValidationException {
