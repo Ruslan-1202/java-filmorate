@@ -1,25 +1,23 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.StorageException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
 
     final FilmStorage filmStorage;
-
-    public FilmService(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
+    final UserStorage userStorage;
 
     public Collection<Film> getValues() {
         return filmStorage.getValues();
@@ -35,14 +33,14 @@ public class FilmService {
 
     public Film update(Film film) {
         Long id = film.getId();
-        Film oldFilm = get(id);
+        Film oldFilm = get(film.getId());
 
         oldFilm.setDescription(film.getDescription());
         oldFilm.setName(film.getName());
         oldFilm.setDuration(film.getDuration());
         oldFilm.setReleaseDate(film.getReleaseDate());
 
-        return filmStorage.update(film).orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
+        return filmStorage.update(oldFilm).orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
     }
 
     public void setLike(Long filmId, Long userId) {
@@ -71,9 +69,10 @@ public class FilmService {
     }
 
     private User getUser(Long id) {
-        //TODO сделать получение юзера
-        return Optional.of(new User(id, "em@em.ru", "qq", "name 1", LocalDate.now()))
+        return userStorage.get(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь c id = " + id + " не найден"));
+//        return Optional.of(new User(id, "em@em.ru", "qq", "name 1", LocalDate.now()))
+//                .orElseThrow(() -> new ObjectNotFoundException("Пользователь c id = " + id + " не найден"));
     }
 
 }

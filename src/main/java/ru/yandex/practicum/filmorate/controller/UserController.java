@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Set;
 
 @RestController()
 @RequestMapping("/users")
@@ -34,40 +35,50 @@ public class UserController {
         } catch (EmptyNameException e) {
             user.setName(user.getLogin());
         }
-
         return userService.create(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.debug("Обновление пользователя");
-        User newUser = user;
-        Long oldId = newUser.getId();
-        User oldUser = userService.get(oldId);
-
-        if (oldUser == null) {
-            log.error("Пользователь c ID = {} не найден", oldId);
-            throw new ValidationException("Пользователь не найден");
-        }
-
         try {
-            check(newUser);
+            check(user);
         } catch (EmptyNameException e) {
-            newUser.setName(newUser.getLogin());
+            user.setName(user.getLogin());
         }
-
-        oldUser.setLogin(newUser.getLogin());
-        oldUser.setName(newUser.getName());
-        oldUser.setEmail(newUser.getEmail());
-        oldUser.setBirthday(newUser.getBirthday());
-
-        return userService.update(oldUser);
+        return userService.update(user);
     }
-
     @GetMapping("{id}")
     public User getUser(@PathVariable("id") Long id) {
-        log.debug("Получение одного фильма");
+        log.debug("Получение одного пользователя");
         return userService.get(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void putFriend(@PathVariable("id") Long id,
+                          @PathVariable("friendId") Long friendId) {
+        log.debug("Добавление в друзья");
+        userService.putFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Long id,
+                             @PathVariable("friendId") Long friendId) {
+        log.debug("Удаление из друзей");
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("{id}/friends")
+    public Set<User> getFriends(@PathVariable("id") Long id) {
+        log.debug("Список друзей");
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public Set<User> getCommonFriends(@PathVariable("id") Long id,
+                                      @PathVariable("otherId") Long otherId) {
+        log.debug("Список друзей, общих с другим пользователем");
+        return userService.getCommonFriends(id, otherId);
     }
 
     private void check(User user) throws ValidationException, EmptyNameException {

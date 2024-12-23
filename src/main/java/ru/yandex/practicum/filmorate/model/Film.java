@@ -19,6 +19,5 @@ public class Film {
     @Size(max = 200, message = "Слишком длинное описание")
     private String description;
     private LocalDate releaseDate;
-    //Duration не проходит автотесты
     private Integer duration;
 }
