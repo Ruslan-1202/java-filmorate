@@ -9,13 +9,13 @@ import java.util.Set;
 
 public interface FilmStorage {
 
-    public Collection<Film> getValues();
+    Collection<Film> getValues();
 
-    public Optional<Film> create(Film film);
+    Optional<Film> create(Film film);
 
-    public Optional<Film> get(Long id);
+    Optional<Film> get(Long id);
 
-    public Optional<Film> update(Film film);
+    Optional<Film> update(Film film);
 
     Set<User> getLikeUsers(Film film);
 

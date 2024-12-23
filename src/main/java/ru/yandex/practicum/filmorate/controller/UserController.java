@@ -48,6 +48,7 @@ public class UserController {
         }
         return userService.update(user);
     }
+
     @GetMapping("{id}")
     public User getUser(@PathVariable("id") Long id) {
         log.debug("Получение одного пользователя");
