@@ -19,7 +19,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserController {
 
-    final UserService userService;
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getUsers() {

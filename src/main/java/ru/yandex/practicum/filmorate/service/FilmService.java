@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilmService {
 
-    final FilmStorage filmStorage;
-    final UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Collection<Film> getValues() {
         return filmStorage.getValues();
@@ -71,8 +71,6 @@ public class FilmService {
     private User getUser(Long id) {
         return userStorage.get(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь c id = " + id + " не найден"));
-//        return Optional.of(new User(id, "em@em.ru", "qq", "name 1", LocalDate.now()))
-//                .orElseThrow(() -> new ObjectNotFoundException("Пользователь c id = " + id + " не найден"));
     }
 
 }

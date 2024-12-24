@@ -18,7 +18,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmController {
 
-    final FilmService filmService;
+    private final FilmService filmService;
 
     private static final int MIN_YEAR = 1895;
     private static final int MIN_MONTH = 12;
