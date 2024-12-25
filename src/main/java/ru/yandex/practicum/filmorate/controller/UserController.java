@@ -1,26 +1,30 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.EmptyNameException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserManager;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Set;
 
 @RestController()
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
-    UserManager userManager = new UserManager();
+
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getUsers() {
         log.debug("Получение всех записей");
-        return userManager.getValues();
+        return userService.getValues();
     }
 
     @PostMapping
@@ -31,34 +35,51 @@ public class UserController {
         } catch (EmptyNameException e) {
             user.setName(user.getLogin());
         }
-
-        return userManager.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.debug("Обновление пользователя");
-        User newUser = user;
-        Long oldId = newUser.getId();
-        User oldUser = userManager.get(oldId);
-
-        if (oldUser == null) {
-            log.error("Пользователь c ID = {} не найден", oldId);
-            throw new ValidationException("Пользователь не найден");
-        }
-
         try {
-            check(newUser);
+            check(user);
         } catch (EmptyNameException e) {
-            newUser.setName(newUser.getLogin());
+            user.setName(user.getLogin());
         }
+        return userService.update(user);
+    }
 
-        oldUser.setLogin(newUser.getLogin());
-        oldUser.setName(newUser.getName());
-        oldUser.setEmail(newUser.getEmail());
-        oldUser.setBirthday(newUser.getBirthday());
+    @GetMapping("{id}")
+    public User getUser(@PathVariable("id") Long id) {
+        log.debug("Получение одного пользователя");
+        return userService.get(id);
+    }
 
-        return userManager.update(oldUser);
+    @PutMapping("/{id}/friends/{friendId}")
+    public void putFriend(@PathVariable("id") Long id,
+                          @PathVariable("friendId") Long friendId) {
+        log.debug("Добавление в друзья");
+        userService.putFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Long id,
+                             @PathVariable("friendId") Long friendId) {
+        log.debug("Удаление из друзей");
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("{id}/friends")
+    public Set<User> getFriends(@PathVariable("id") Long id) {
+        log.debug("Список друзей");
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public Set<User> getCommonFriends(@PathVariable("id") Long id,
+                                      @PathVariable("otherId") Long otherId) {
+        log.debug("Список друзей, общих с другим пользователем");
+        return userService.getCommonFriends(id, otherId);
     }
 
     private void check(User user) throws ValidationException, EmptyNameException {
