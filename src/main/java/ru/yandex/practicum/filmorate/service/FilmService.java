@@ -6,7 +6,9 @@ import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.StorageException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
@@ -19,16 +21,23 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
+    public FilmService() {
+        filmStorage = new FilmDbStorage();
+        userStorage = new InMemoryUserStorage();
+    }
+
     public Collection<Film> getValues() {
         return filmStorage.getValues();
     }
 
     public Film create(Film film) {
-        return filmStorage.create(film).orElseThrow(() -> new StorageException("Не удалось создать фильм"));
+        return filmStorage.create(film)
+                .orElseThrow(() -> new StorageException("Не удалось создать фильм"));
     }
 
     public Film get(Long id) {
-        return filmStorage.get(id).orElseThrow(() -> new ObjectNotFoundException("Фильм c id = " + id + " не найден"));
+        return filmStorage.get(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Фильм c id = " + id + " не найден"));
     }
 
     public Film update(Film film) {
@@ -40,7 +49,8 @@ public class FilmService {
         oldFilm.setDuration(film.getDuration());
         oldFilm.setReleaseDate(film.getReleaseDate());
 
-        return filmStorage.update(oldFilm).orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
+        return filmStorage.update(oldFilm)
+                .orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
     }
 
     public void setLike(Long filmId, Long userId) {
