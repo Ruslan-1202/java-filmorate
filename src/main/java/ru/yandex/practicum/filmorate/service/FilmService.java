@@ -1,30 +1,24 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.StorageException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FilmService {
 
+    //@Qualifier("filmDbStorage") // не работает, почему? Работает только @Primary
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-
-    public FilmService() {
-        filmStorage = new FilmDbStorage();
-        userStorage = new InMemoryUserStorage();
-    }
 
     public Collection<Film> getValues() {
         return filmStorage.getValues();

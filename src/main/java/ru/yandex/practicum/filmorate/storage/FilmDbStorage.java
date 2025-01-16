@@ -1,15 +1,24 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 
-@Component
+@Component("filmDbStorage")
+@Primary
+@RequiredArgsConstructor
+@Repository
 public class FilmDbStorage implements FilmStorage {
 
-    // private final NamedParameterJdbcOperations jdbc = null;
+    private final NamedParameterJdbcOperations jdbc;
+    private final RowMapper<Film> mapper;
 
     private final HashMap<Long, Film> films = new HashMap<>();
     private final HashMap<Film, Set<User>> likes = new HashMap<>();
@@ -17,7 +26,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getValues() {
-        return films.values();
+        List<Film> films = jdbc.query("SELECT * FROM \"films\" f LEFT JOIN \"mpa\" m ON f.\"mpa_id\" = m.\"id\"", mapper);
+        //   List<Film> films = jdbc.query("SELECT * FROM \"films\"", mapper);
+
+        return films;
     }
 
     @Override
