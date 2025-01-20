@@ -52,7 +52,7 @@ public class UserDbStorage implements UserStorage {
         try {
             user = jdbc.queryForObject(SELECT_USERS + " WHERE \"id\" = :id", params, userMapper);
         } catch (EmptyResultDataAccessException e) {
-            user = null
+            user = null;
         }
 
         return Optional.ofNullable(user);
