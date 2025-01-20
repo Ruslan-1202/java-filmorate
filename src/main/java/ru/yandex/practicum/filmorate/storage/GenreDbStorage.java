@@ -22,11 +22,11 @@ public class GenreDbStorage implements GenreStorage {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
-        Genre genre = null;
+        Genre genre;
         try {
             genre = jdbc.queryForObject("SELECT * FROM \"genres\" WHERE \"id\" = :id", params, mapper);
         } catch (EmptyResultDataAccessException e) {
-
+            genre = null;
         }
 
         return Optional.ofNullable(genre);

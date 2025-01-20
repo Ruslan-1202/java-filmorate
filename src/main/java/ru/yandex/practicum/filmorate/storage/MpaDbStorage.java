@@ -22,11 +22,11 @@ public class MpaDbStorage implements MpaStorage {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
-        Mpa mpa = null;
+        Mpa mpa;
         try {
             mpa = jdbc.queryForObject("SELECT * FROM \"mpa\" WHERE \"id\" = :id", params, mapper);
         } catch (EmptyResultDataAccessException e) {
-
+            mpa = null;
         }
 
         return Optional.ofNullable(mpa);

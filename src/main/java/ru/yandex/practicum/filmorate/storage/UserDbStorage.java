@@ -48,11 +48,11 @@ public class UserDbStorage implements UserStorage {
     public Optional<User> get(Long id) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
-        User user = null;
+        User user;
         try {
             user = jdbc.queryForObject(SELECT_USERS + " WHERE \"id\" = :id", params, userMapper);
         } catch (EmptyResultDataAccessException e) {
-
+            user = null
         }
 
         return Optional.ofNullable(user);
