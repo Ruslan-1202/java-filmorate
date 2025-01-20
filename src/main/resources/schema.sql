@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "films"
     "name"         VARCHAR(255),
     "description"  VARCHAR(255),
     "mpa_id"       INTEGER REFERENCES "genres" ("id"),
-    "Release_Date" DATE,
+    "release_date" DATE,
     "duration"     INTEGER
 );
 

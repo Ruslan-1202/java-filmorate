@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.StorageException;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class FilmService {
 
-    //@Qualifier("filmDbStorage") // не работает, почему? Работает только @Primary
+    @Qualifier("filmDbStorage") // не работает, почему? Работает только @Primary
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 

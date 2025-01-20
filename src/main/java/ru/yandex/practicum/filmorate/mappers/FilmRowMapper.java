@@ -17,6 +17,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setId(resultSet.getLong("films.id"));
         film.setName(resultSet.getString("films.name"));
         film.setDescription(resultSet.getString("description"));
+        film.setDuration(resultSet.getInt("duration"));
 
         try {
             Mpa mpa = new Mpa(resultSet.getLong("mpa.id"), resultSet.getString("mpa.name"));
@@ -25,8 +26,12 @@ public class FilmRowMapper implements RowMapper<Film> {
             film.setMpa(null);
         }
 
-        LocalDate releaseDate = resultSet.getDate("release_date").toLocalDate();
-        film.setReleaseDate(releaseDate);
+        java.sql.Date sqlDate = resultSet.getDate("release_date");
+        if (sqlDate != null) {
+            LocalDate releaseDate = resultSet.getDate("release_date").toLocalDate();
+            film.setReleaseDate(releaseDate);
+        }
+
         return film;
     }
 }
