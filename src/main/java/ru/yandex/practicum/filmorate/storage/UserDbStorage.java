@@ -1,15 +1,29 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("userDbStorage")
 @Primary
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
+    private static final String SELECT_USERS = "SELECT * FROM \"users\" ";
+
+    private final NamedParameterJdbcOperations jdbc;
+    private final RowMapper<User> userMapper;
 
     private final HashMap<Long, User> users = new HashMap<>();
     private final HashMap<User, Set<User>> friends = new HashMap<>();
@@ -17,56 +31,103 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> create(User user) {
-        user.setId(++counter);
-        users.put(counter, user);
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", user.getName());
+        params.addValue("login", user.getLogin());
+        params.addValue("email", user.getEmail());
+        params.addValue("birthday", user.getBirthday());
+
+        jdbc.update("INSERT INTO \"users\" (\"name\", \"login\", \"email\", \"birthday\") " +
+                "VALUES (:name, :login, :email, :birthday)", params, keyHolder, new String[]{"id"});
+        user.setId(keyHolder.getKey().longValue());
         return Optional.of(user);
     }
 
     @Override
     public Optional<User> get(Long id) {
-        return Optional.ofNullable(users.get(id));
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        User user = null;
+        try {
+            user = jdbc.queryForObject(SELECT_USERS + " WHERE \"id\" = :id", params, userMapper);
+        } catch (EmptyResultDataAccessException e) {
+
+        }
+
+        return Optional.ofNullable(user);
     }
 
     @Override
     public Optional<User> update(User user) {
-        return Optional.ofNullable(users.put(user.getId(), user));
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", user.getId());
+        params.addValue("name", user.getName());
+        params.addValue("login", user.getLogin());
+        params.addValue("email", user.getEmail());
+        params.addValue("birthday", user.getBirthday());
+
+        jdbc.update("UPDATE \"users\" SET \"name\" = :name, " +
+                "\"login\" = :login, " +
+                "\"email\" = :email, " +
+                "\"birthday\" = :birthday " +
+                "WHERE \"id\" = :id", params);
+
+        return Optional.ofNullable(user);
     }
 
     @Override
     public Collection<User> getValues() {
-        return users.values();
+        return jdbc.query(SELECT_USERS, userMapper);
     }
 
     @Override
     public void putFriend(User user, User friend) {
-        Set<User> userSet = friends.computeIfAbsent(user, a -> new HashSet<>());
-        userSet.add(friend);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("user_id", user.getId());
+        params.addValue("friend_id", friend.getId());
 
-        Set<User> friendSet = friends.computeIfAbsent(friend, a -> new HashSet<>());
-        friendSet.add(user);
+        jdbc.update("INSERT INTO \"friends\" (\"user_id\", \"friend_id\") VALUES (:user_id, :friend_id)", params);
     }
 
     @Override
     public void deleteFriend(User user, User friend) {
-        Set<User> userSet = friends.computeIfAbsent(user, a -> new HashSet<>());
-        userSet.remove(friend);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("user_id", user.getId());
+        params.addValue("friend_id", friend.getId());
 
-        Set<User> friendSet = friends.computeIfAbsent(friend, a -> new HashSet<>());
-        friendSet.remove(user);
+        jdbc.update("DELETE FROM \"friends\" " +
+                "WHERE \"user_id\" = :user_id AND \"friend_id\" = :friend_id", params);
     }
 
     @Override
     public Set<User> getFriends(User user) {
-        return friends.computeIfAbsent(user, a -> new HashSet<>());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("user_id", user.getId());
+
+        return jdbc.query("SELECT u.* FROM \"users\" u " +
+                                "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
+                                "WHERE f.\"user_id\" = :user_id"
+                        , params
+                        , userMapper)
+                .stream()
+                .collect(Collectors.toSet());
     }
 
     @Override
     public Set<User> getCommonFriends(User user, User otherUser) {
-        Set<User> userSet = friends.computeIfAbsent(user, a -> new HashSet<>());
-        Set<User> otherUserSet = friends.computeIfAbsent(otherUser, a -> new HashSet<>());
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("user_id", user.getId());
+        params.addValue("other_user_id", otherUser.getId());
 
-        return userSet.stream()
-                .filter(a -> otherUserSet.contains(a))
+        return jdbc.query("SELECT u.* FROM \"users\" u " +
+                                "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
+                                "JOIN \"friends\" f1 ON f1.\"friend_id\" = u.\"id\" " +
+                                "WHERE f.\"user_id\" = :user_id " +
+                                "AND f1.\"user_id\" = :other_user_id "
+                        , params
+                        , userMapper)
+                .stream()
                 .collect(Collectors.toSet());
     }
 }

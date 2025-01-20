@@ -97,12 +97,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private void updateGenres(Film film) {
         Long filmId = film.getId();
-        SqlParameterSource[] batch = film.getGenres().stream()
-                .map(a -> new MapSqlParameterSource()
-                        .addValue("film_id", filmId)
-                        .addValue("genre_id", a.getId())
-                )
-                .toArray(SqlParameterSource[]::new);
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("film_id", filmId);
@@ -110,9 +104,18 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.update("DELETE FROM \"film_genres\" " +
                 "WHERE \"film_id\" = :film_id", params);
 
-        if (!film.getGenres().isEmpty()) {
-            jdbc.batchUpdate("INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\") VALUES(:film_id, :genre_id)", batch);
+        if (film.getGenres() == null || film.getGenres().isEmpty()) {
+            return;
         }
+
+        SqlParameterSource[] batch = film.getGenres().stream()
+                .map(a -> new MapSqlParameterSource()
+                        .addValue("film_id", filmId)
+                        .addValue("genre_id", a.getId())
+                )
+                .toArray(SqlParameterSource[]::new);
+
+        jdbc.batchUpdate("INSERT INTO \"film_genres\" (\"film_id\", \"genre_id\") VALUES(:film_id, :genre_id)", batch);
     }
 
     @Override
@@ -159,7 +162,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void setLike(Film film, User user) {
-
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("film_id", film.getId());
         params.addValue("user_id", user.getId());
