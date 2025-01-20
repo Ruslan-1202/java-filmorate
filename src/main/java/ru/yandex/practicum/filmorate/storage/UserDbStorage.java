@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,10 +23,6 @@ public class UserDbStorage implements UserStorage {
 
     private final NamedParameterJdbcOperations jdbc;
     private final RowMapper<User> userMapper;
-
-    private final HashMap<Long, User> users = new HashMap<>();
-    private final HashMap<User, Set<User>> friends = new HashMap<>();
-    private Long counter = 0L;
 
     @Override
     public Optional<User> create(User user) {
@@ -106,10 +101,8 @@ public class UserDbStorage implements UserStorage {
         params.addValue("user_id", user.getId());
 
         return jdbc.query("SELECT u.* FROM \"users\" u " +
-                                "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
-                                "WHERE f.\"user_id\" = :user_id"
-                        , params
-                        , userMapper)
+                        "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
+                        "WHERE f.\"user_id\" = :user_id", params, userMapper)
                 .stream()
                 .collect(Collectors.toSet());
     }
@@ -121,12 +114,10 @@ public class UserDbStorage implements UserStorage {
         params.addValue("other_user_id", otherUser.getId());
 
         return jdbc.query("SELECT u.* FROM \"users\" u " +
-                                "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
-                                "JOIN \"friends\" f1 ON f1.\"friend_id\" = u.\"id\" " +
-                                "WHERE f.\"user_id\" = :user_id " +
-                                "AND f1.\"user_id\" = :other_user_id "
-                        , params
-                        , userMapper)
+                        "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
+                        "JOIN \"friends\" f1 ON f1.\"friend_id\" = u.\"id\" " +
+                        "WHERE f.\"user_id\" = :user_id " +
+                        "AND f1.\"user_id\" = :other_user_id ", params, userMapper)
                 .stream()
                 .collect(Collectors.toSet());
     }
