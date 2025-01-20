@@ -28,7 +28,7 @@ public class FilmDbStorage implements FilmStorage {
     private final RowMapper<Film> mapper;
     private final RowMapper<Genre> mapperGenre;
     private final RowMapper<FilmGenre> mapperFilmGenre;
-    private final RowMapper<Likes> LikesRowMapper;
+    private final RowMapper<Likes> likesRowMapperikesRowMapper;
 
     @Override
     public Collection<Film> getValues() {
@@ -174,7 +174,7 @@ public class FilmDbStorage implements FilmStorage {
 
         Set<User> users = jdbc.query("SELECT l.\"film_id\", u.* FROM \"likes\" l " +
                         "JOIN \"users\" u ON l.\"user_id\" = u.\"id\" " +
-                        "WHERE \"film_id\" = :film_id", params, LikesRowMapper).stream()
+                        "WHERE \"film_id\" = :film_id", params, likesRowMapperikesRowMapper).stream()
                 .map(a -> a.getUser())
                 .collect(Collectors.toCollection(HashSet::new));
         return users;
