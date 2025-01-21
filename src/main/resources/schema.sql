@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS film_genres
 (
     film_id  INTEGER REFERENCES films (id)  NOT NULL,
     genre_id INTEGER REFERENCES genres (id) NOT NULL,
-    constraint friends_pk primary key (film_id, genre_id)
+    constraint film_genres_pk primary key (film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS friends
