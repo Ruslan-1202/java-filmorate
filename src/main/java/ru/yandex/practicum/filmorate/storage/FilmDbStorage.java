@@ -207,7 +207,7 @@ public class FilmDbStorage implements FilmStorage {
         params.addValue("film_id", film.getId());
         params.addValue("user_id", user.getId());
 
-        return jdbc.queryForObject(""" 
+        return jdbc.queryForObject("""
                 SELECT COUNT(*) FROM likes WHERE film_id = :film_id AND user_id = :user_id
                 """, params, Long.class) == 1L;
     }
@@ -232,7 +232,7 @@ public class FilmDbStorage implements FilmStorage {
                                (SELECT COUNT(*) FROM likes WHERE likes.film_id = f.id) as like_count
                         FROM films f
                         JOIN mpa ON f.mpa_id = mpa.id
-                        ORDER BY like_count DESC 
+                        ORDER BY like_count DESC
                         LIMIT :count
                 """, params, mapper);
 
@@ -244,9 +244,9 @@ public class FilmDbStorage implements FilmStorage {
         params.addValue("films", films.stream().map(Film::getId).collect(Collectors.toList()));
 
         //жанры для выбранных фильмов
-        List<FilmGenre> filmGenres = jdbc.query(""" 
-                SELECT * FROM film_genres fg 
-                JOIN genres g ON fg.genre_id = g.id 
+        List<FilmGenre> filmGenres = jdbc.query("""
+                SELECT * FROM film_genres fg
+                JOIN genres g ON fg.genre_id = g.id
                 WHERE fg.film_id IN (:films) """, params, mapperFilmGenre);
         //для фильмов получаем списки жанров
         for (Film film : films) {
