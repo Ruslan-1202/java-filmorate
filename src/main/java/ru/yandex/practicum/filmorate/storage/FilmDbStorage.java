@@ -162,10 +162,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void setLike(Film film, User user) {
-//        if (isLikeExists(film, user)) {
-//            throw new ValidationException("Этот пользователь уже ставил лайк фильму");
-//        };
-
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("film_id", film.getId());
         params.addValue("user_id", user.getId());
@@ -188,11 +184,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void deleteLike(Film film, User user) {
-        if (!isLikeExists(film, user)) {
-            throw new ValidationException("Этот пользователь не ставил лайк фильму");
-        }
-        ;
-
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("film_id", film.getId());
         params.addValue("user_id", user.getId());

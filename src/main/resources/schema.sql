@@ -48,5 +48,5 @@ CREATE TABLE IF NOT EXISTS likes
 (
     film_id INTEGER REFERENCES films (id) NOT NULL,
     user_id INTEGER REFERENCES users (id) NOT NULL,
-    constraint likes_pk primary key (FILM_ID, USER_ID)
+    constraint likes_pk primary key (film_id, user_id)
 );
