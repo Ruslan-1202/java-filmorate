@@ -24,7 +24,7 @@ public class MpaDbStorage implements MpaStorage {
 
         Mpa mpa;
         try {
-            mpa = jdbc.queryForObject("SELECT * FROM \"mpa\" WHERE \"id\" = :id", params, mapper);
+            mpa = jdbc.queryForObject("SELECT * FROM mpa WHERE id = :id", params, mapper);
         } catch (EmptyResultDataAccessException e) {
             mpa = null;
         }
@@ -34,6 +34,6 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Collection<Mpa> getAll() {
-        return jdbc.query("SELECT * FROM \"mpa\" ", mapper);
+        return jdbc.query("SELECT * FROM mpa ", mapper);
     }
 }

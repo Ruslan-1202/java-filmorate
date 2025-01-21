@@ -24,4 +24,6 @@ public interface FilmStorage {
     void deleteLike(Film film, User user);
 
     long getCountLikes(Film film);
+
+    Collection<Film> topLikes(Long count);
 }

@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -67,10 +66,7 @@ public class FilmService {
     }
 
     public Collection<Film> topLikes(Long count) {
-        return filmStorage.getValues().stream()
-                .sorted((Film a, Film b) -> (int) filmStorage.getCountLikes(b) - (int) filmStorage.getCountLikes(a))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.topLikes(count);
     }
 
     private User getUser(Long id) {

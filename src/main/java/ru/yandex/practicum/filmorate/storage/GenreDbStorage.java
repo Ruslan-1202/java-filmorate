@@ -24,7 +24,7 @@ public class GenreDbStorage implements GenreStorage {
 
         Genre genre;
         try {
-            genre = jdbc.queryForObject("SELECT * FROM \"genres\" WHERE \"id\" = :id", params, mapper);
+            genre = jdbc.queryForObject("SELECT * FROM genres WHERE id = :id", params, mapper);
         } catch (EmptyResultDataAccessException e) {
             genre = null;
         }
@@ -34,6 +34,6 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Collection<Genre> getAll() {
-        return jdbc.query("SELECT * FROM \"genres\" ", mapper);
+        return jdbc.query("SELECT * FROM genres ", mapper);
     }
 }

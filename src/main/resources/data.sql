@@ -1,4 +1,4 @@
-merge into "genres"
+merge into genres
     VALUES (1, 'Комедия'),
            (2, 'Драма'),
            (3, 'Мультфильм'),
@@ -6,7 +6,7 @@ merge into "genres"
            (5, 'Документальный'),
            (6, 'Боевик');
 
-merge into "mpa"
+merge into mpa
     VALUES (1, 'G'),
            (2, 'PG'),
            (3, 'PG-13'),

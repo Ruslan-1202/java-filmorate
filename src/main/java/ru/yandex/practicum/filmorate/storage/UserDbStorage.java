@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Primary
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-    private static final String SELECT_USERS = "SELECT * FROM \"users\" ";
+    private static final String SELECT_USERS = "SELECT * FROM users ";
 
     private final NamedParameterJdbcOperations jdbc;
     private final RowMapper<User> userMapper;
@@ -33,7 +33,7 @@ public class UserDbStorage implements UserStorage {
         params.addValue("email", user.getEmail());
         params.addValue("birthday", user.getBirthday());
 
-        jdbc.update("INSERT INTO \"users\" (\"name\", \"login\", \"email\", \"birthday\") " +
+        jdbc.update("INSERT INTO users (name, login, email, birthday) " +
                 "VALUES (:name, :login, :email, :birthday)", params, keyHolder, new String[]{"id"});
         user.setId(keyHolder.getKey().longValue());
         return Optional.of(user);
@@ -45,7 +45,7 @@ public class UserDbStorage implements UserStorage {
         params.addValue("id", id);
         User user;
         try {
-            user = jdbc.queryForObject(SELECT_USERS + " WHERE \"id\" = :id", params, userMapper);
+            user = jdbc.queryForObject(SELECT_USERS + " WHERE id = :id", params, userMapper);
         } catch (EmptyResultDataAccessException e) {
             user = null;
         }
@@ -62,11 +62,11 @@ public class UserDbStorage implements UserStorage {
         params.addValue("email", user.getEmail());
         params.addValue("birthday", user.getBirthday());
 
-        jdbc.update("UPDATE \"users\" SET \"name\" = :name, " +
-                "\"login\" = :login, " +
-                "\"email\" = :email, " +
-                "\"birthday\" = :birthday " +
-                "WHERE \"id\" = :id", params);
+        jdbc.update("UPDATE users SET name = :name, " +
+                "login = :login, " +
+                "email = :email, " +
+                "birthday = :birthday " +
+                "WHERE id = :id", params);
 
         return Optional.ofNullable(user);
     }
@@ -82,7 +82,7 @@ public class UserDbStorage implements UserStorage {
         params.addValue("user_id", user.getId());
         params.addValue("friend_id", friend.getId());
 
-        jdbc.update("INSERT INTO \"friends\" (\"user_id\", \"friend_id\") VALUES (:user_id, :friend_id)", params);
+        jdbc.update("INSERT INTO friends (user_id, friend_id) VALUES (:user_id, :friend_id)", params);
     }
 
     @Override
@@ -91,8 +91,8 @@ public class UserDbStorage implements UserStorage {
         params.addValue("user_id", user.getId());
         params.addValue("friend_id", friend.getId());
 
-        jdbc.update("DELETE FROM \"friends\" " +
-                "WHERE \"user_id\" = :user_id AND \"friend_id\" = :friend_id", params);
+        jdbc.update("DELETE FROM friends " +
+                "WHERE user_id = :user_id AND friend_id = :friend_id", params);
     }
 
     @Override
@@ -100,9 +100,9 @@ public class UserDbStorage implements UserStorage {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", user.getId());
 
-        return jdbc.query("SELECT u.* FROM \"users\" u " +
-                        "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
-                        "WHERE f.\"user_id\" = :user_id", params, userMapper)
+        return jdbc.query("SELECT u.* FROM users u " +
+                        "JOIN friends f ON f.friend_id = u.id " +
+                        "WHERE f.user_id = :user_id", params, userMapper)
                 .stream()
                 .collect(Collectors.toSet());
     }
@@ -113,11 +113,11 @@ public class UserDbStorage implements UserStorage {
         params.addValue("user_id", user.getId());
         params.addValue("other_user_id", otherUser.getId());
 
-        return jdbc.query("SELECT u.* FROM \"users\" u " +
-                        "JOIN \"friends\" f ON f.\"friend_id\" = u.\"id\" " +
-                        "JOIN \"friends\" f1 ON f1.\"friend_id\" = u.\"id\" " +
-                        "WHERE f.\"user_id\" = :user_id " +
-                        "AND f1.\"user_id\" = :other_user_id ", params, userMapper)
+        return jdbc.query("SELECT u.* FROM users u " +
+                        "JOIN friends f ON f.friend_id = u.id " +
+                        "JOIN friends f1 ON f1.friend_id = u.id " +
+                        "WHERE f.user_id = :user_id " +
+                        "AND f1.user_id = :other_user_id ", params, userMapper)
                 .stream()
                 .collect(Collectors.toSet());
     }
