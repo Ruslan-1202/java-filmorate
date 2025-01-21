@@ -162,16 +162,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void setLike(Film film, User user) {
-        if (isLikeExists(film, user)) {
-            throw new ValidationException("Этот пользователь уже ставил лайк фильму");
-        }
-        ;
+//        if (isLikeExists(film, user)) {
+//            throw new ValidationException("Этот пользователь уже ставил лайк фильму");
+//        };
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("film_id", film.getId());
         params.addValue("user_id", user.getId());
 
-        jdbc.update("INSERT INTO likes (film_id, user_id) VALUES (:film_id, :user_id)", params);
+        jdbc.update("MERGE INTO likes (film_id, user_id) VALUES (:film_id, :user_id)", params);
     }
 
     @Override

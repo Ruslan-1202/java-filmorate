@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -22,7 +23,7 @@ public class UserDbStorage implements UserStorage {
     private static final String SELECT_USERS = "SELECT * FROM users ";
 
     private final NamedParameterJdbcOperations jdbc;
-    private final RowMapper<User> userMapper;
+    private static final RowMapper<User> userMapper = new UserRowMapper();
 
     @Override
     public Optional<User> create(User user) {
