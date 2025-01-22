@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.StorageException;
@@ -10,12 +11,12 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FilmService {
 
+    @Qualifier("filmDbStorage") // не работает, почему? Работает только @Primary
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -24,11 +25,13 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-        return filmStorage.create(film).orElseThrow(() -> new StorageException("Не удалось создать фильм"));
+        return filmStorage.create(film)
+                .orElseThrow(() -> new StorageException("Не удалось создать фильм"));
     }
 
     public Film get(Long id) {
-        return filmStorage.get(id).orElseThrow(() -> new ObjectNotFoundException("Фильм c id = " + id + " не найден"));
+        return filmStorage.get(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Фильм c id = " + id + " не найден"));
     }
 
     public Film update(Film film) {
@@ -40,7 +43,8 @@ public class FilmService {
         oldFilm.setDuration(film.getDuration());
         oldFilm.setReleaseDate(film.getReleaseDate());
 
-        return filmStorage.update(oldFilm).orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
+        return filmStorage.update(oldFilm)
+                .orElseThrow(() -> new StorageException("Не удалось обновить фильм id = " + id));
     }
 
     public void setLike(Long filmId, Long userId) {
@@ -62,10 +66,7 @@ public class FilmService {
     }
 
     public Collection<Film> topLikes(Long count) {
-        return filmStorage.getValues().stream()
-                .sorted((Film a, Film b) -> (int) filmStorage.getCountLikes(b) - (int) filmStorage.getCountLikes(a))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.topLikes(count);
     }
 
     private User getUser(Long id) {

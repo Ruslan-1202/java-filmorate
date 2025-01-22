@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -55,5 +56,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public long getCountLikes(Film film) {
         return likes.getOrDefault(film, new HashSet<>()).size();
+    }
+
+    @Override
+    public Collection<Film> topLikes(Long count) {
+        return getValues().stream()
+                .sorted((Film a, Film b) -> (int) getCountLikes(b) - (int) getCountLikes(a))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

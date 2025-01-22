@@ -67,7 +67,8 @@ public class FilmController {
     @GetMapping("/popular")
     public Collection<Film> topLikes(@RequestParam(value = "count", defaultValue = "10") Long count) {
         log.debug("Запрос по количеству лайков");
-        return filmService.topLikes(count);
+        Collection<Film> films = filmService.topLikes(count);
+        return films;
     }
 
     private void check(Film film) throws ValidationException {
