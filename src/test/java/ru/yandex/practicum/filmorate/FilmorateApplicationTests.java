@@ -19,27 +19,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({UserDbStorage.class})
-class FilmoRateApplicationTests {
+class FilmorateApplicationTests {
 
 	private final UserDbStorage userStorage;
 
+	static User getTestUser() {
+		User user = new User();
+		user.setId(1L);
+		user.setName("Name 1");
+		user.setLogin("Login 1");
+		user.setBirthday(LocalDate.of(1990, 1, 1));
+		return user;
+	}
 	@Test
 	public void testFindUserById() {
-		User user = new User();
-		user.setName("Name 1");
-		user.setEmail("email 1");
-		user.setBirthday(LocalDate.of(1990, 1, 1));
-		userStorage.create(user);
+		User user = getTestUser();
 
 		Optional<User> userOptional = userStorage.get(1L);
 
+		//Этот не нужен здесь, нижний дает сравнение по всем полям
+//		assertThat(userOptional)
+//				.isPresent()
+//				.hasValueSatisfying(a ->
+//						assertThat(a).hasFieldOrPropertyWithValue("id", 1L)
+//				)
+//				.hasValueSatisfying(a ->
+//						assertThat(a).hasFieldOrPropertyWithValue("name", "Name 1")
+//				);
+
 		assertThat(userOptional)
 				.isPresent()
-				.hasValueSatisfying(a ->
-						assertThat(a).hasFieldOrPropertyWithValue("id", 1L)
-				)
-				.hasValueSatisfying(a ->
-						assertThat(a).hasFieldOrPropertyWithValue("name", "Name 1")
-				);
+				.get()
+				.usingRecursiveComparison()
+				.isEqualTo(user);
 	}
 }

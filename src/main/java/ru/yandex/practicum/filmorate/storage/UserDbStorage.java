@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private static final String SELECT_USERS = "SELECT * FROM users ";
+    private static final RowMapper<User> userMapper = new UserRowMapper();
 
     private final NamedParameterJdbcOperations jdbc;
-    private static final RowMapper<User> userMapper = new UserRowMapper();
 
     @Override
     public Optional<User> create(User user) {
